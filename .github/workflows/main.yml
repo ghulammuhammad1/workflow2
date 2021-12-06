@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      build_number: ${{ steps.buildnumber.outputs.build_number }}
+    steps:
+    - name: Generate build number
+      id: buildnumber
+      uses: einaregilsson/build-number@master
+      with:
+        token: ${{secrets.github_token}}
+    - name: Print ENV
+      uses: einaregilsson/print-environment@master
+          
+  job2:
+    needs: job1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Another step as an example
+      uses: actions/hello-world-docker-action@v1
+      with:
+        who-to-greet: ${{needs.job1.outputs.build_number}}
+    - name: Print ENV
+      uses: einaregilsson/print-environment@master
